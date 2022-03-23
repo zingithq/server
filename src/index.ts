@@ -5,6 +5,7 @@ import helmet from 'helmet';
 
 import envConfig from './config/config';
 import dbConfig from './config/mongoConfig';
+import checkRequestOrigin from './middlewares/checkRequestOrigin.middleware';
 
 const app: Application = express();
 app.use(cors());
@@ -16,7 +17,8 @@ app.use(
 		':date[iso] :remote-addr :method :url :status :res[content-length] - :response-time ms'
 	)
 );
-// TODO: Add middlewares for rate limiting, rate slowing, origin blocking, etc.
+app.use(checkRequestOrigin);
+// TODO: Add middlewares for rate limiting, rate slowing, origin blocking, fileLogging etc.
 
 dbConfig(envConfig.MONGO_URI);
 

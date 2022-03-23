@@ -10,6 +10,8 @@ type Config = {
 	MONGO_URI: string;
 	JWT_SECRET: string;
 	ENVIRONMENT: string;
+	CRYPTO_KEY: string;
+	CRYPTO_IV: string;
 };
 
 const envConfig: Config =
@@ -19,12 +21,16 @@ const envConfig: Config =
 				MONGO_URI: process.env.MONGO_URI as string,
 				JWT_SECRET: process.env.JWT_SECRET as string,
 				ENVIRONMENT: process.env.NODE_ENV as string,
+				CRYPTO_KEY: process.env.CRYPTO_KEY as string,
+				CRYPTO_IV: process.env.CRYPTO_IV as string,
 		  }
 		: {
 				PORT: 8080,
 				MONGO_URI: 'mongodb://localhost:27017/zingit',
 				JWT_SECRET: 'blablasecrethello123',
 				ENVIRONMENT: 'development',
+				CRYPTO_KEY: '11111111111111111111111111111111',
+				CRYPTO_IV: '1111111111111111',
 		  };
 
 export default envConfig;
