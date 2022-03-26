@@ -7,7 +7,7 @@ const NotificationSchema: Schema = new Schema(
 			required: true,
 			enum: [
 				'order-placed', // send this notif to outlet owner
-				'order-accepted', // send the below notifs to user
+				'order-accepted', // send the below notifs to student
 				'order-declined',
 				'order-prepared',
 				'order-almost-prepared',

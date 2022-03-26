@@ -23,7 +23,7 @@ const CampusSchema: Schema = new Schema(
 			trim: true,
 		},
 		campusEmailDomain: {
-			// Example: @goa.bits-pilani.ac.in
+			// Example: goa.bits-pilani.ac.in
 			type: String,
 			required: true,
 			trim: true,
@@ -36,4 +36,4 @@ const CampusSchema: Schema = new Schema(
 	}
 );
 
-module.exports = mongoose.model('Campus', CampusSchema);
+export default mongoose.model('Campus', CampusSchema);

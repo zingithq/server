@@ -23,17 +23,19 @@ const UserSchema: Schema = new Schema(
 		userRole: {
 			type: String,
 			required: true,
-			enum: ['owner', 'user'],
+			enum: ['owner', 'student'],
 			lowercase: true,
 		},
-		// userHostel: {
-		// 	type: String,
-		// 	required() {
-		// 		return this.role === 'user';
-		// 	},
-		// 	trim: true,
-		// 	lowercase: true,
-		// },
+		userPhone: {
+			type: String,
+			required() {
+				return this.role === 'owner';
+			},
+			trim: true,
+			lowercase: true,
+			unique: true,
+			length: 10,
+		},
 		userCart: [
 			{
 				itemId: {
@@ -58,4 +60,4 @@ const UserSchema: Schema = new Schema(
 	}
 );
 
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

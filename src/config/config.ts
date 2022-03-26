@@ -12,6 +12,7 @@ type Config = {
 	ENVIRONMENT: string;
 	CRYPTO_KEY: string;
 	CRYPTO_IV: string;
+	ORIGIN_EXPIRY_TIME: number;
 };
 
 const envConfig: Config =
@@ -23,6 +24,7 @@ const envConfig: Config =
 				ENVIRONMENT: process.env.NODE_ENV as string,
 				CRYPTO_KEY: process.env.CRYPTO_KEY as string,
 				CRYPTO_IV: process.env.CRYPTO_IV as string,
+				ORIGIN_EXPIRY_TIME: Number(process.env.ORIGIN_EXPIRY_TIME),
 		  }
 		: {
 				PORT: 8080,
@@ -31,6 +33,7 @@ const envConfig: Config =
 				ENVIRONMENT: 'development',
 				CRYPTO_KEY: '11111111111111111111111111111111',
 				CRYPTO_IV: '1111111111111111',
+				ORIGIN_EXPIRY_TIME: 120,
 		  };
 
 export default envConfig;

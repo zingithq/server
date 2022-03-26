@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import envConfig from '../config/config';
 
 import decryptText from '../helpers/decryptText';
 import responseHandler from '../utils/responseHandler';
@@ -17,17 +18,25 @@ const checkRequestOrigin = (
 	res: Response,
 	next: NextFunction
 ) => {
-	const reqOrigin: string = req.headers['req-origin'] as string;
+	if (!req.headers['req-origin']) {
+		return errorHandler('REQ_ORIGIN_REQUIRED');
+	}
+
+	if (typeof req.headers['req-origin'] !== 'string') {
+		return errorHandler('REQ_ORIGIN_REQUIRED');
+	}
+
+	const reqOrigin = req.headers['req-origin'];
 	if (!reqOrigin || !reqOrigin.trim()) {
 		return res.status(403).json({
 			response: errorHandler('REQ_ORIGIN_REQUIRED'),
 		});
 	}
 
-	const reqOriginClean: string = reqOrigin.trim();
-	const decryptedOrigin: string = decryptText(reqOriginClean);
+	const reqOriginClean = reqOrigin.trim();
+	const decryptedOrigin = decryptText(reqOriginClean);
 
-	const originParts: string[] = decryptedOrigin.split('/');
+	const originParts = decryptedOrigin.split('/');
 	const originTime = Number(originParts[0]);
 	const originApp = originParts[1];
 
@@ -41,7 +50,8 @@ const checkRequestOrigin = (
 	const originTimeInSeconds = Math.floor(originTime / 1000);
 	const diff = nowInSeconds - originTimeInSeconds;
 
-	if (diff > 10) {
+	const secondsToExpire = envConfig.ORIGIN_EXPIRY_TIME;
+	if (diff > secondsToExpire) {
 		return res.status(403).json({
 			response: errorHandler('REQ_ORIGIN_EXPIRED'),
 		});
@@ -53,6 +63,8 @@ const checkRequestOrigin = (
 		});
 	}
 
+	res.locals.appType = originApp as string;
 	return next();
 };
+
 export default checkRequestOrigin;
