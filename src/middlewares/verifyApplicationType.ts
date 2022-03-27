@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import appTypeValidator from '../helpers/appTypeValidator';
 
+import uniqueCodes from '../constants/uniqueCodes';
+import appTypeValidator from '../helpers/appTypeValidator';
 import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
 
@@ -20,13 +21,13 @@ const verifyApplicationType =
 
 		if (cleanAppType !== requiredAppType) {
 			const errorMessage: IResponseMessage = responseHandler({
-				statusCode: 400,
-				message: 'Application type is not valid',
-				uniqueCode: 'APP_TYPE_NOT_VALID',
+				uniqueCodeData: uniqueCodes.appTypeNotValid,
 				data: { type: 'error', payload: null },
 				functionName: 'verifyApplicationType',
 			});
-			return res.status(errorMessage.statusCode).json(errorMessage);
+			return res
+				.status(errorMessage.statusCode)
+				.json({ response: errorMessage });
 		}
 		return next();
 	};

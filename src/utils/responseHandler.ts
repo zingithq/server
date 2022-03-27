@@ -3,13 +3,14 @@ import IResponseMessage from '../types/IResponseMessage';
 import IResponseParams from '../types/IResponseParams';
 
 const responseHandler = (responseObject: IResponseParams) => {
-	const { message, statusCode, uniqueCode, data, functionName } =
-		responseObject;
+	const { uniqueCodeData, data, functionName } = responseObject;
+
+	const { message, status, code } = uniqueCodeData;
 
 	const response: IResponseMessage = {
 		message,
-		statusCode,
-		uniqueCode,
+		statusCode: status,
+		uniqueCode: code,
 		data,
 		functionName,
 	};

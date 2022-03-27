@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import IResponseMessage from '../../types/IResponseMessage';
-import { getUserWithEmailOrId, userAuth } from './user.dal';
+import { getLoggedInUser, userAuth } from './user.dal';
 
 const auth = async (req: Request, res: Response) => {
 	const { appType } = res.locals;
@@ -18,16 +18,15 @@ const auth = async (req: Request, res: Response) => {
 		.json({ response: userAuthResponse });
 };
 
-const getLoggedInUser = async (req: Request, res: Response) => {
-	const { appType, userId } = res.locals;
+const loggedUser = async (req: Request, res: Response) => {
+	const { appType, loggedInUser } = res.locals;
 
-	const userWithEmail = await getUserWithEmailOrId({
-		email: null,
-		userId,
+	const userWithEmail = await getLoggedInUser({
 		appType,
+		loggedInUser,
 	});
 
 	return res.status(userWithEmail.statusCode).json({ response: userWithEmail });
 };
 
-export { auth, getLoggedInUser };
+export { auth, loggedUser };

@@ -2,7 +2,10 @@ import User from './user.model';
 import IResponseMessage from '../../types/IResponseMessage';
 import responseHandler from '../../utils/responseHandler';
 import emailValidator from '../../helpers/emailValidator';
-import checkCampusExistance from '../campus/campus.dal';
+import getCampusFromDomain from '../campus/campus.dal';
+import uniqueCodes from '../../constants/uniqueCodes';
+import signJwt from '../../helpers/signJwt';
+import appTypeValidator from '../../helpers/appTypeValidator';
 
 const getUserWithEmailOrId = async (contextObject: {
 	email: string | null;
@@ -21,9 +24,7 @@ const getUserWithEmailOrId = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 400,
-					message: 'Email or user id is required',
-					uniqueCode: 'EMAIL_OR_USER_ID_REQUIRED',
+					uniqueCodeData: uniqueCodes.emailOrUserIdRequired,
 					data: { type: 'error', payload: null },
 					functionName: 'getUserWithEmailOrId',
 				})
@@ -41,9 +42,7 @@ const getUserWithEmailOrId = async (contextObject: {
 			return new Promise((resolve) =>
 				resolve(
 					responseHandler({
-						statusCode: 404,
-						message: 'User not found',
-						uniqueCode: 'USER_NOT_FOUND',
+						uniqueCodeData: uniqueCodes.userNotFound,
 						data: { type: 'error', payload: null },
 						functionName: 'getUserWithEmailOrId',
 					})
@@ -54,9 +53,7 @@ const getUserWithEmailOrId = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 200,
-					message: 'User found',
-					uniqueCode: 'USER_FOUND',
+					uniqueCodeData: uniqueCodes.userFound,
 					data: { type: 'success', payload: user },
 					functionName: 'getUserWithEmailOrId',
 				})
@@ -66,9 +63,7 @@ const getUserWithEmailOrId = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 500,
-					message: 'Internal server error',
-					uniqueCode: 'INTERNAL_SERVER_ERROR',
+					uniqueCodeData: uniqueCodes.internalServerError,
 					data: { type: 'error', payload: null },
 					functionName: 'getUserWithEmailOrId',
 				})
@@ -95,9 +90,7 @@ const createStudent = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 400,
-					message: 'Invalid app type',
-					uniqueCode: 'INVALID_APP_TYPE',
+					uniqueCodeData: uniqueCodes.appTypeNotValid,
 					data: { type: 'error', payload: null },
 					functionName: 'createStudent',
 				})
@@ -112,9 +105,7 @@ const createStudent = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 400,
-					message: 'User full name is required',
-					uniqueCode: 'USER_FULL_NAME_REQUIRED',
+					uniqueCodeData: uniqueCodes.userFullNameRequired,
 					data: { type: 'error', payload: null },
 					functionName: 'createStudent',
 				})
@@ -123,7 +114,7 @@ const createStudent = async (contextObject: {
 	}
 
 	const userEmailDomain: string = emailFinal.split('@')[1];
-	const getCampusExistance: IResponseMessage = await checkCampusExistance({
+	const getCampusExistance: IResponseMessage = await getCampusFromDomain({
 		campusEmailDomain: userEmailDomain,
 	});
 
@@ -145,9 +136,7 @@ const createStudent = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 201,
-					message: 'User created',
-					uniqueCode: 'USER_CREATED',
+					uniqueCodeData: uniqueCodes.userCreated,
 					data: { type: 'success', payload: newStudent },
 					functionName: 'createStudent',
 				})
@@ -157,9 +146,7 @@ const createStudent = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 500,
-					message: 'Internal server error',
-					uniqueCode: 'INTERNAL_SERVER_ERROR',
+					uniqueCodeData: uniqueCodes.internalServerError,
 					data: { type: 'error', payload: null },
 					functionName: 'createStudent',
 				})
@@ -181,14 +168,12 @@ const userAuth = async (contextObject: {
 		appType,
 	});
 	if (userWithEmail.data.type === 'error') {
-		if (userWithEmail.uniqueCode === 'USER_NOT_FOUND') {
+		if (userWithEmail.uniqueCode === uniqueCodes.userNotFound.code) {
 			if (appType === 'zing_owner') {
 				return new Promise((resolve) =>
 					resolve(
 						responseHandler({
-							statusCode: 404,
-							message: 'User not found',
-							uniqueCode: 'USER_NOT_FOUND',
+							uniqueCodeData: uniqueCodes.userNotFound,
 							data: { type: 'error', payload: null },
 							functionName: 'userAuth',
 						})
@@ -202,12 +187,58 @@ const userAuth = async (contextObject: {
 				appType,
 			});
 
+			const studentObj = newStudent.data.payload as Record<string, unknown>;
+
+			const signJwtResponse: string = signJwt({
+				email: studentObj.userEmail as string,
+				_id: studentObj._id as string,
+			});
+
+			newStudent.data.payload = {
+				user: newStudent.data.payload,
+				token: signJwtResponse,
+			};
+
 			return newStudent;
 		}
 		return userWithEmail;
 	}
 
+	const userObj = userWithEmail.data.payload as Record<string, unknown>;
+
+	const signJwtResponse: string = signJwt({
+		email: userObj.userEmail as string,
+		_id: userObj._id as string,
+	});
+
+	userWithEmail.data.payload = {
+		user: userWithEmail.data.payload,
+		token: signJwtResponse,
+	};
+
 	return userWithEmail;
 };
 
-export { userAuth, getUserWithEmailOrId };
+const getLoggedInUser = async (contextObject: {
+	appType: string;
+	loggedInUser: unknown;
+}): Promise<IResponseMessage> => {
+	const { appType, loggedInUser } = contextObject;
+
+	const appValidation = appTypeValidator(appType);
+	if (appValidation.data.type === 'error') {
+		return appValidation;
+	}
+
+	return new Promise((resolve) =>
+		resolve(
+			responseHandler({
+				uniqueCodeData: uniqueCodes.userFound,
+				data: { type: 'success', payload: loggedInUser },
+				functionName: 'getLoggedInUser',
+			})
+		)
+	);
+};
+
+export { userAuth, getUserWithEmailOrId, createStudent, getLoggedInUser };

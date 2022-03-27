@@ -1,3 +1,4 @@
+import uniqueCodes from '../constants/uniqueCodes';
 import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
 
@@ -7,9 +8,7 @@ const emailValidator = (email: string): IResponseMessage => {
 
 	if (!emailClean) {
 		return responseHandler({
-			statusCode: 400,
-			message: 'Email is required',
-			uniqueCode: 'EMAIL_REQUIRED',
+			uniqueCodeData: uniqueCodes.emailRequired,
 			data: { type: 'error', payload: null },
 			functionName: 'emailValidator',
 		});
@@ -21,18 +20,14 @@ const emailValidator = (email: string): IResponseMessage => {
 
 	if (!emailRegex.test(emailClean)) {
 		return responseHandler({
-			statusCode: 400,
-			message: 'Email is not valid',
-			uniqueCode: 'EMAIL_NOT_VALID',
+			uniqueCodeData: uniqueCodes.emailNotValid,
 			data: { type: 'error', payload: null },
 			functionName: 'emailValidator',
 		});
 	}
 
 	return responseHandler({
-		statusCode: 200,
-		message: 'Email is valid',
-		uniqueCode: 'EMAIL_VALID',
+		uniqueCodeData: uniqueCodes.emailValid,
 		data: { type: 'success', payload: emailClean },
 		functionName: 'emailValidator',
 	});

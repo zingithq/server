@@ -1,6 +1,7 @@
 import Campus from './campus.model';
 import IResponseMessage from '../../types/IResponseMessage';
 import responseHandler from '../../utils/responseHandler';
+import uniqueCodes from '../../constants/uniqueCodes';
 
 /**
  * @description - This function is used to check if a campus exists.
@@ -8,7 +9,7 @@ import responseHandler from '../../utils/responseHandler';
  * @param {string} campusEmailDomain - The campus email domain(e.g. goa.bits-pilani.ac.in)
  */
 
-const checkCampusExistance = async (contextObject: {
+const getCampusFromDomain = async (contextObject: {
 	campusEmailDomain: string;
 }): Promise<IResponseMessage> => {
 	const { campusEmailDomain } = contextObject;
@@ -20,11 +21,9 @@ const checkCampusExistance = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 400,
-					message: 'Campus email domain is required',
-					uniqueCode: 'CAMPUS_EMAIL_DOMAIN_REQUIRED',
+					uniqueCodeData: uniqueCodes.campusDomainRequired,
 					data: { type: 'error', payload: null },
-					functionName: 'checkCampusExistance',
+					functionName: 'getCampusFromDomain',
 				})
 			)
 		);
@@ -39,11 +38,9 @@ const checkCampusExistance = async (contextObject: {
 			return new Promise((resolve) =>
 				resolve(
 					responseHandler({
-						statusCode: 404,
-						message: 'Campus does not exist',
-						uniqueCode: 'CAMPUS_DOES_NOT_EXIST',
+						uniqueCodeData: uniqueCodes.campusNotFound,
 						data: { type: 'error', payload: null },
-						functionName: 'checkCampusExistance',
+						functionName: 'getCampusFromDomain',
 					})
 				)
 			);
@@ -52,11 +49,9 @@ const checkCampusExistance = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 200,
-					message: 'Campus exists',
-					uniqueCode: 'CAMPUS_EXISTS',
+					uniqueCodeData: uniqueCodes.campusFound,
 					data: { type: 'success', payload: campus },
-					functionName: 'checkCampusExistance',
+					functionName: 'getCampusFromDomain',
 				})
 			)
 		);
@@ -64,15 +59,13 @@ const checkCampusExistance = async (contextObject: {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
-					statusCode: 500,
-					message: 'Internal server error',
-					uniqueCode: 'INTERNAL_SERVER_ERROR',
+					uniqueCodeData: uniqueCodes.internalServerError,
 					data: { type: 'error', payload: null },
-					functionName: 'checkCampusExistance',
+					functionName: 'getCampusFromDomain',
 				})
 			)
 		);
 	}
 };
 
-export default checkCampusExistance;
+export default getCampusFromDomain;
