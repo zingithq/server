@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { getUserWithEmailOrId } from '../components/user/user.dal';
 
 import envConfig from '../config/config';
 import uniqueCodes from '../constants/uniqueCodes';
 import appTypeValidator from '../helpers/appTypeValidator';
 import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
+import { getUserWithEmailOrId } from '../components/user/user.dal';
+import IUserModel from '../types/IUserModel';
 
 const unauthorizedMessage = (): IResponseMessage =>
 	responseHandler({
@@ -15,8 +16,13 @@ const unauthorizedMessage = (): IResponseMessage =>
 		functionName: 'verifyToken',
 	});
 
+/**
+ *  @description: Conditional middleware to check:
+ * 		-	If the JWT is valid and matches the registered user
+ */
+
 const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
-	const { JWT_SECRET }: { JWT_SECRET: string } = envConfig;
+	const { JWT_SECRET } = envConfig;
 
 	const { authorization } = req.headers;
 
@@ -50,8 +56,8 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 
 		if (appValidation.data.type === 'error') {
 			return res
-				.status(unauthorizedMessage().statusCode)
-				.json({ response: unauthorizedMessage() });
+				.status(appValidation.statusCode)
+				.json({ response: appValidation });
 		}
 
 		const appTypeClean = appValidation.data.payload as string;
@@ -74,7 +80,7 @@ const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
 				.json({ response: unauthorizedMessage() });
 		}
 
-		res.locals.loggedInUser = loggedInUser.data.payload;
+		res.locals.loggedInUser = loggedInUser.data.payload as IUserModel;
 
 		return next();
 	});

@@ -7,8 +7,7 @@
 		"start": "NODE_ENV=production node dist/index.js",
 		"dev": "NODE_ENV=development ts-node-dev src/index.ts",
 		"build": "npm run lint && tsc -p .",
-		"lint": "eslint ./src",
-		"test": "jest --detectOpenHandles"
+		"lint": "eslint ./src"
 	},
 	"repository": {
 		"type": "git",

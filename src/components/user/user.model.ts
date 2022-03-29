@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+import IUserModel from '../../types/IUserModel';
+
 const UserSchema: Schema = new Schema(
 	{
 		userEmail: {
@@ -14,6 +16,13 @@ const UserSchema: Schema = new Schema(
 			required: true,
 			trim: true,
 			lowercase: true,
+		},
+		userProfileImage: {
+			// TODO: Add profile Image link for default
+			type: String,
+			required: true,
+			trim: true,
+			default: 'https://google.com/imgae',
 		},
 		campusId: {
 			type: Schema.Types.ObjectId,
@@ -60,4 +69,4 @@ const UserSchema: Schema = new Schema(
 	}
 );
 
-export default mongoose.model('User', UserSchema);
+export default mongoose.model<IUserModel>('User', UserSchema);

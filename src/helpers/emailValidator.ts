@@ -3,16 +3,16 @@ import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
 
 const emailValidator = (email: string): IResponseMessage => {
-	let emailClean = email.trim();
-	emailClean = emailClean.toLowerCase();
-
-	if (!emailClean) {
+	if (!email || !email.trim()) {
 		return responseHandler({
 			uniqueCodeData: uniqueCodes.emailRequired,
 			data: { type: 'error', payload: null },
 			functionName: 'emailValidator',
 		});
 	}
+
+	let emailClean = email.trim();
+	emailClean = emailClean.toLowerCase();
 
 	// email regex
 	const emailRegex =

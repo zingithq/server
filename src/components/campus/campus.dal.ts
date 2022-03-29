@@ -2,6 +2,7 @@ import Campus from './campus.model';
 import IResponseMessage from '../../types/IResponseMessage';
 import responseHandler from '../../utils/responseHandler';
 import uniqueCodes from '../../constants/uniqueCodes';
+import ICampusModel from '../../types/ICampusModel';
 
 /**
  * @description - This function is used to check if a campus exists.
@@ -14,10 +15,7 @@ const getCampusFromDomain = async (contextObject: {
 }): Promise<IResponseMessage> => {
 	const { campusEmailDomain } = contextObject;
 
-	let cleanCampusEmailDomain = campusEmailDomain.trim();
-	cleanCampusEmailDomain = cleanCampusEmailDomain.toLowerCase();
-
-	if (!cleanCampusEmailDomain) {
+	if (!campusEmailDomain || !campusEmailDomain.trim()) {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
@@ -29,8 +27,11 @@ const getCampusFromDomain = async (contextObject: {
 		);
 	}
 
+	let cleanCampusEmailDomain = campusEmailDomain.trim();
+	cleanCampusEmailDomain = cleanCampusEmailDomain.toLowerCase();
+
 	try {
-		const campus: unknown = await Campus.findOne({
+		const campus: ICampusModel | null = await Campus.findOne({
 			campusEmailDomain: cleanCampusEmailDomain,
 		});
 

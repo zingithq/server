@@ -3,10 +3,7 @@ import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
 
 const appTypeValidator = (appType: string): IResponseMessage => {
-	let appTypeClean = appType.trim();
-	appTypeClean = appTypeClean.toLowerCase();
-
-	if (!appTypeClean) {
+	if (!appType || !appType.trim()) {
 		return responseHandler({
 			uniqueCodeData: uniqueCodes.appTypeRequired,
 			data: { type: 'error', payload: null },
@@ -14,7 +11,10 @@ const appTypeValidator = (appType: string): IResponseMessage => {
 		});
 	}
 
-	if (appType !== 'zing_owner' && appType !== 'zing_student') {
+	let appTypeClean = appType.trim();
+	appTypeClean = appTypeClean.toLowerCase();
+
+	if (appTypeClean !== 'zing_owner' && appTypeClean !== 'zing_student') {
 		return responseHandler({
 			uniqueCodeData: uniqueCodes.appTypeNotValid,
 			data: { type: 'error', payload: null },

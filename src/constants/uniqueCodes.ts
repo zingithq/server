@@ -16,12 +16,12 @@ const uniqueCodes = {
 	},
 	appTypeNotValid: {
 		code: 'APP_TYPE_NOT_VALID',
-		status: 400,
+		status: 403,
 		message: 'App type is not valid',
 	},
 	appTypeRequired: {
 		code: 'APP_TYPE_REQUIRED',
-		status: 400,
+		status: 403,
 		message: 'App type is required',
 	},
 	appTypeValid: {
@@ -93,6 +93,66 @@ const uniqueCodes = {
 		code: 'UNAUTHORIZED',
 		status: 401,
 		message: 'Token unauthorized',
+	},
+	invalidUserId: {
+		code: 'INVALID_USER_ID',
+		status: 400,
+		message: 'Invalid user id',
+	},
+	invalidItemId: {
+		code: 'INVALID_ITEM_ID',
+		status: 400,
+		message: 'Invalid item id',
+	},
+	itemNotAvailable: {
+		code: 'ITEM_NOT_AVAILABLE',
+		status: 404,
+		message: 'Item not available',
+	},
+	itemAvailable: {
+		code: 'ITEM_AVAILABLE',
+		status: 200,
+		message: 'Item available',
+	},
+	unprocessable: {
+		code: 'UNPROCESSABLE',
+		status: 422,
+		message: 'Request unprocessable',
+	},
+	userNotCreated: {
+		code: 'USER_NOT_CREATED',
+		status: 400,
+		message: 'User not created',
+	},
+	invalidCart: {
+		code: 'INVALID_CART',
+		status: 400,
+		message: 'Invalid cart',
+	},
+	invalidOutletId: {
+		code: 'INVALID_OUTLET_ID',
+		status: 400,
+		message: 'Invalid outlet id',
+	},
+	invalidQuantity: {
+		code: 'INVALID_QUANTITY',
+		status: 400,
+		message: 'Invalid quantity',
+	},
+	cartNotUpdated: {
+		code: 'CART_NOT_UPDATED',
+		status: 400,
+		message: 'Cart not updated',
+	},
+	cartUpdated: {
+		code: 'CART_UPDATED',
+		status: 200,
+		message: 'Cart updated',
+	},
+	itemAddedToCart: {
+		code: 'ITEM_ADDED_TO_CART',
+		status: 200,
+		message: 'Item added to cart',
 	},
 };
 

@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+import IItemModel from '../../types/IItemModel';
+
 const ItemSchema: Schema = new Schema(
 	{
 		itemName: {
@@ -47,4 +49,4 @@ const ItemSchema: Schema = new Schema(
 	}
 );
 
-module.exports = mongoose.model('Item', ItemSchema);
+export default mongoose.model<IItemModel>('Item', ItemSchema);

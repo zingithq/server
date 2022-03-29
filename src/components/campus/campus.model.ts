@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+import ICampusModel from '../../types/ICampusModel';
+
 const CampusSchema: Schema = new Schema(
 	{
 		campusName: {
@@ -36,4 +38,4 @@ const CampusSchema: Schema = new Schema(
 	}
 );
 
-export default mongoose.model('Campus', CampusSchema);
+export default mongoose.model<ICampusModel>('Campus', CampusSchema);

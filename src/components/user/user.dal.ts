@@ -6,6 +6,8 @@ import getCampusFromDomain from '../campus/campus.dal';
 import uniqueCodes from '../../constants/uniqueCodes';
 import signJwt from '../../helpers/signJwt';
 import appTypeValidator from '../../helpers/appTypeValidator';
+import IUserModel from '../../types/IUserModel';
+import ICampusModel from '../../types/ICampusModel';
 
 const getUserWithEmailOrId = async (contextObject: {
 	email: string | null;
@@ -14,13 +16,7 @@ const getUserWithEmailOrId = async (contextObject: {
 }): Promise<IResponseMessage> => {
 	const { email, appType, userId } = contextObject;
 
-	let cleanEmail = email?.trim();
-	cleanEmail = cleanEmail?.toLowerCase();
-
-	let cleanUserId = userId?.trim();
-	cleanUserId = cleanUserId?.toLowerCase();
-
-	if (!cleanEmail && !cleanUserId) {
+	if ((!email || !email.trim()) && (!userId || !userId.trim())) {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
@@ -32,10 +28,30 @@ const getUserWithEmailOrId = async (contextObject: {
 		);
 	}
 
+	let cleanEmail: string | null = null;
+	if (email && email.trim()) {
+		cleanEmail = email.trim();
+		cleanEmail = cleanEmail.toLowerCase();
+	}
+
+	let cleanUserId: string | null = null;
+	if (userId && userId.trim()) {
+		cleanUserId = userId.trim();
+		cleanUserId = cleanUserId.toLowerCase();
+	}
+
+	const appValidation = appTypeValidator(appType);
+	if (appValidation.data.type === 'error') {
+		return new Promise((resolve) => resolve(appValidation));
+	}
+
+	const appTypeFinal = appValidation.data.payload as string;
+	const userRole = appTypeFinal === 'zing_student' ? 'student' : 'owner';
+
 	try {
-		const user: unknown = await User.findOne({
+		const user: IUserModel | null = await User.findOne({
 			$or: [{ userEmail: cleanEmail }, { _id: cleanUserId }],
-			userRole: appType === 'zing_owner' ? 'owner' : 'student',
+			userRole,
 		});
 
 		if (!user) {
@@ -98,10 +114,7 @@ const createStudent = async (contextObject: {
 		);
 	}
 
-	let userFullNameClean = userFullName.trim();
-	userFullNameClean = userFullNameClean.toLowerCase();
-
-	if (!userFullNameClean) {
+	if (!userFullName || !userFullName.trim()) {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
@@ -113,7 +126,10 @@ const createStudent = async (contextObject: {
 		);
 	}
 
-	const userEmailDomain: string = emailFinal.split('@')[1];
+	let userFullNameClean = userFullName.trim();
+	userFullNameClean = userFullNameClean.toLowerCase();
+
+	const userEmailDomain = emailFinal.split('@')[1];
 	const getCampusExistance: IResponseMessage = await getCampusFromDomain({
 		campusEmailDomain: userEmailDomain,
 	});
@@ -122,16 +138,28 @@ const createStudent = async (contextObject: {
 		return getCampusExistance;
 	}
 
-	const { _id } = getCampusExistance.data.payload as Record<string, unknown>;
+	const { _id } = getCampusExistance.data.payload as ICampusModel;
 	const campusId = _id;
 
 	try {
-		const newStudent: unknown = await User.create({
-			userEmail: email,
-			userFullName,
+		const newStudent: IUserModel = await User.create({
+			userEmail: emailFinal,
+			userFullName: userFullNameClean,
 			userRole: 'student',
 			campusId,
 		});
+
+		if (!newStudent) {
+			return new Promise((resolve) =>
+				resolve(
+					responseHandler({
+						uniqueCodeData: uniqueCodes.userNotCreated,
+						data: { type: 'error', payload: null },
+						functionName: 'createStudent',
+					})
+				)
+			);
+		}
 
 		return new Promise((resolve) =>
 			resolve(
@@ -187,7 +215,7 @@ const userAuth = async (contextObject: {
 				appType,
 			});
 
-			const studentObj = newStudent.data.payload as Record<string, unknown>;
+			const studentObj = newStudent.data.payload as IUserModel;
 
 			const signJwtResponse: string = signJwt({
 				email: studentObj.userEmail as string,
@@ -204,7 +232,7 @@ const userAuth = async (contextObject: {
 		return userWithEmail;
 	}
 
-	const userObj = userWithEmail.data.payload as Record<string, unknown>;
+	const userObj = userWithEmail.data.payload as IUserModel;
 
 	const signJwtResponse: string = signJwt({
 		email: userObj.userEmail as string,
@@ -221,13 +249,28 @@ const userAuth = async (contextObject: {
 
 const getLoggedInUser = async (contextObject: {
 	appType: string;
-	loggedInUser: unknown;
+	loggedInUser: IUserModel;
 }): Promise<IResponseMessage> => {
 	const { appType, loggedInUser } = contextObject;
 
 	const appValidation = appTypeValidator(appType);
 	if (appValidation.data.type === 'error') {
-		return appValidation;
+		return new Promise((resolve) => resolve(appValidation));
+	}
+
+	const userRole =
+		loggedInUser.userRole === 'student' ? 'zing_student' : 'zing_owner';
+
+	if (userRole !== appType) {
+		return new Promise((resolve) =>
+			resolve(
+				responseHandler({
+					uniqueCodeData: uniqueCodes.appTypeNotValid,
+					data: { type: 'error', payload: null },
+					functionName: 'getLoggedInUser',
+				})
+			)
+		);
 	}
 
 	return new Promise((resolve) =>

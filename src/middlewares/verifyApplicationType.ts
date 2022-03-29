@@ -5,12 +5,17 @@ import appTypeValidator from '../helpers/appTypeValidator';
 import IResponseMessage from '../types/IResponseMessage';
 import responseHandler from '../utils/responseHandler';
 
+/**
+ * @description: Conditional middleware to check:
+ * 	- if the request origin matches the required origin for that API
+ */
+
 const verifyApplicationType =
 	(requiredAppType: string) =>
 	async (req: Request, res: Response, next: NextFunction) => {
 		const { appType } = res.locals;
 
-		const appValidation = appTypeValidator(appType);
+		const appValidation: IResponseMessage = appTypeValidator(appType);
 		if (appValidation.data.type === 'error') {
 			return res
 				.status(appValidation.statusCode)

@@ -13,6 +13,13 @@ const errorHandler = (uniqueCodeData: IUniqueCode) =>
 		functionName: 'checkRequestOrigin',
 	});
 
+/**
+ *
+ * @description: Middelware to check:
+ *	 - if the request is coming from one of the two apps or not
+ *	 - if the incomming request is expired or not
+ */
+
 const checkRequestOrigin = (
 	req: Request,
 	res: Response,
@@ -28,9 +35,9 @@ const checkRequestOrigin = (
 
 	if (typeof req.headers['req-origin'] !== 'string') {
 		return res
-			.status(errorHandler(uniqueCodes.reqOriginRequired).statusCode)
+			.status(errorHandler(uniqueCodes.reqOriginInvalid).statusCode)
 			.json({
-				response: errorHandler(uniqueCodes.reqOriginRequired),
+				response: errorHandler(uniqueCodes.reqOriginInvalid),
 			});
 	}
 
@@ -44,6 +51,7 @@ const checkRequestOrigin = (
 	}
 
 	const reqOriginClean = reqOrigin.trim();
+
 	const decryptedOrigin = decryptText(reqOriginClean);
 
 	const originParts = decryptedOrigin.split('/');

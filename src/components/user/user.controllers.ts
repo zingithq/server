@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+
 import IResponseMessage from '../../types/IResponseMessage';
 import { getLoggedInUser, userAuth } from './user.dal';
 
