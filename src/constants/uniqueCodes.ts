@@ -154,6 +154,16 @@ const uniqueCodes = {
 		status: 200,
 		message: 'Item added to cart',
 	},
+	itemRemovedFromCart: {
+		code: 'ITEM_REMOVED_FROM_CART',
+		status: 200,
+		message: 'Item removed from cart',
+	},
+	cartCleared: {
+		code: 'CART_CLEARED',
+		status: 200,
+		message: 'Cart cleared',
+	},
 };
 
 export default uniqueCodes;
