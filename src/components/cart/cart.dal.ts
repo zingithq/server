@@ -28,7 +28,7 @@ const getUserCart = async (contextObject: {
 	const userIdClean = userId.trim();
 
 	try {
-		const userCart = await User.findById(userIdClean).select('cart');
+		const userCart = await User.findById(userIdClean).select('userCart');
 
 		if (!userCart) {
 			return new Promise((resolve) =>
