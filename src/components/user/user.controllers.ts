@@ -19,7 +19,7 @@ const auth = async (req: Request, res: Response) => {
 		.json({ response: userAuthResponse });
 };
 
-const loggedUser = async (req: Request, res: Response) => {
+const loggedUser = async (_: Request, res: Response) => {
 	const { appType, loggedInUser } = res.locals;
 
 	const userWithEmail = await getLoggedInUser({

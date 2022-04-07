@@ -1,15 +1,12 @@
 import uniqueCodes from '../../constants/uniqueCodes';
 import IItemModel from '../../types/IItemModel';
+import IOutletModel from '../../types/IOutletModel';
 import IResponseMessage from '../../types/IResponseMessage';
+import TUserCart from '../../types/TUserCart';
 import responseHandler from '../../utils/responseHandler';
-import isItemAvailable from '../item/item.dal';
+import { isItemAvailable } from '../item/item.dal';
+import { getOutletDetails } from '../outlet/outlet.dal';
 import User from '../user/user.model';
-
-type UserCartType = Array<{
-	itemId: string;
-	outletId: string;
-	quantity: number;
-}>;
 
 const getUserCart = async (contextObject: {
 	userId: string;
@@ -69,7 +66,7 @@ const getUserCart = async (contextObject: {
 
 const updateCartHelper = async (contextObj: {
 	userId: string;
-	cart: UserCartType;
+	cart: TUserCart;
 }): Promise<IResponseMessage> => {
 	const { cart, userId } = contextObj;
 
@@ -99,7 +96,7 @@ const updateCartHelper = async (contextObj: {
 		);
 	}
 
-	let cleanCart: UserCartType = cart;
+	let cleanCart: TUserCart = cart;
 
 	if (cart.length !== 0) {
 		for (let i = 0; i < cart.length; i += 1) {
@@ -248,6 +245,27 @@ const addItemToCart = async (contextObject: {
 		return checkItemAvailability;
 	}
 
+	const checkOutletAvailability: IResponseMessage = await getOutletDetails({
+		outletId: outletIdClean,
+	});
+
+	if (checkOutletAvailability.data.type === 'error') {
+		return checkOutletAvailability;
+	}
+
+	const outletData = checkOutletAvailability.data.payload as IOutletModel;
+	if (!outletData.isOutletActive) {
+		return new Promise((resolve) =>
+			resolve(
+				responseHandler({
+					uniqueCodeData: uniqueCodes.outletNotActive,
+					functionName: 'addItemToCart',
+					data: { type: 'error', payload: null },
+				})
+			)
+		);
+	}
+
 	const item = checkItemAvailability.data.payload as IItemModel;
 
 	if (item.outletId !== outletIdClean) {
@@ -270,9 +288,9 @@ const addItemToCart = async (contextObject: {
 		return currentUserCartData;
 	}
 
-	const userCart = currentUserCartData.data.payload as UserCartType;
+	const userCart = currentUserCartData.data.payload as TUserCart;
 
-	const newUserCart: UserCartType = userCart;
+	const newUserCart: TUserCart = userCart;
 
 	if (userCart.length === 0) {
 		newUserCart.push({
@@ -376,9 +394,9 @@ const removeItemFromCart = async (contextObject: {
 		return currentUserCartData;
 	}
 
-	const userCart = currentUserCartData.data.payload as UserCartType;
+	const userCart = currentUserCartData.data.payload as TUserCart;
 
-	const newUserCart: UserCartType = userCart;
+	const newUserCart: TUserCart = userCart;
 
 	if (userCart.length === 0) {
 		return new Promise((resolve) =>
@@ -457,7 +475,7 @@ const clearUserCart = async (contextObj: {
 
 	const cleanUserId: string = userId.trim();
 
-	const newUserCart: UserCartType = [];
+	const newUserCart: TUserCart = [];
 
 	const updatedUserCart: IResponseMessage = await updateCartHelper({
 		userId: cleanUserId,

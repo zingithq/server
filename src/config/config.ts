@@ -3,7 +3,7 @@ import { resolve } from 'path';
 
 config({ path: resolve(__dirname, '../../.env') });
 
-const environment: string = process.env.NODE_ENV as string;
+const environment = process.env.NODE_ENV as string;
 
 type Config = {
 	PORT: number;
@@ -33,7 +33,7 @@ const envConfig: Config =
 				ENVIRONMENT: 'development',
 				CRYPTO_KEY: '11111111111111111111111111111111',
 				CRYPTO_IV: '1111111111111111',
-				ORIGIN_EXPIRY_TIME: 120,
+				ORIGIN_EXPIRY_TIME: 10 * 86400,
 		  };
 
 export default envConfig;

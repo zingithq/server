@@ -1,15 +1,15 @@
-import mongoose from 'mongoose';
+import { Document } from 'mongoose';
 
 import TUserCart from './TUserCart';
 
-interface IUserModel extends mongoose.Document {
+interface IUserModel extends Document {
 	_id: string;
 	userEmail: string;
 	userFullName: string;
 	userProfileImage: string;
 	campusId: string;
 	userRole: string;
-	userPhone: string | null;
+	userPhone: string;
 	userCart: TUserCart;
 	createdAt: Date;
 	updatedAt: Date;

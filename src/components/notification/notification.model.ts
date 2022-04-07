@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+import INotificationModel from '../../types/INotificationModel';
+
 const NotificationSchema: Schema = new Schema(
 	{
 		notificationType: {
@@ -7,12 +9,17 @@ const NotificationSchema: Schema = new Schema(
 			required: true,
 			enum: [
 				'order-placed', // send this notif to outlet owner
-				'order-accepted', // send the below notifs to student
+				'order-accepted', // send the below notifs to consumer
 				'order-declined',
 				'order-prepared',
 				'order-almost-prepared',
 				'order-collection-pending',
 			],
+			trim: true,
+		},
+		notificationTitle: {
+			type: String,
+			required: true,
 			trim: true,
 		},
 		notificationMessage: {
@@ -31,4 +38,7 @@ const NotificationSchema: Schema = new Schema(
 	}
 );
 
-module.exports = mongoose.model('Notification', NotificationSchema);
+module.exports = mongoose.model<INotificationModel>(
+	'Notification',
+	NotificationSchema
+);

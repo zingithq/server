@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import { Document } from 'mongoose';
 
-interface IItemModel extends mongoose.Document {
+interface IItemModel extends Document {
 	_id: string;
 	itemName: string;
 	isItemVeg: boolean;
@@ -9,6 +9,7 @@ interface IItemModel extends mongoose.Document {
 	itemPrice: number;
 	itemImageSmall: string;
 	itemImageLarge: string;
+	campusId: string;
 	itemCategory: string;
 	createdAt: Date;
 	updatedAt: Date;

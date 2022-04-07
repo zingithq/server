@@ -8,6 +8,6 @@ const router = Router();
 // TODO: Add routes for last login time and last logout timestamp
 
 router.post('/auth', auth);
-router.get('/user', [verifyToken], loggedUser);
+router.get('/', [verifyToken], loggedUser);
 
 export default router;

@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+// TODO: Complete razorpay docs and then model
+
 const PaymentSchema: Schema = new Schema(
 	{
 		orderId: {
@@ -18,9 +20,22 @@ const PaymentSchema: Schema = new Schema(
 			trim: true,
 			lowercase: true,
 		},
+		razorpayPaymentId: {
+			type: String,
+			required: true,
+		},
 		paymentDetails: {
 			type: Object,
 			required: true,
+		},
+		isRefundInitiated: {
+			type: Boolean,
+			required: true,
+			default: false,
+		},
+		refundDetails: {
+			type: Object,
+			required: false,
 		},
 	},
 	{

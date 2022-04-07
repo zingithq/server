@@ -2,7 +2,7 @@ import User from './user.model';
 import IResponseMessage from '../../types/IResponseMessage';
 import responseHandler from '../../utils/responseHandler';
 import emailValidator from '../../helpers/emailValidator';
-import getCampusFromDomain from '../campus/campus.dal';
+import { getCampusFromDomain } from '../campus/campus.dal';
 import uniqueCodes from '../../constants/uniqueCodes';
 import signJwt from '../../helpers/signJwt';
 import appTypeValidator from '../../helpers/appTypeValidator';
@@ -46,13 +46,13 @@ const getUserWithEmailOrId = async (contextObject: {
 	}
 
 	const appTypeFinal = appValidation.data.payload as string;
-	const userRole = appTypeFinal === 'zing_student' ? 'student' : 'owner';
+	const userRole = appTypeFinal === 'zing_consumer' ? 'consumer' : 'owner';
 
 	try {
 		const user: IUserModel | null = await User.findOne({
 			$or: [{ userEmail: cleanEmail }, { _id: cleanUserId }],
 			userRole,
-		});
+		}).select('-_v');
 
 		if (!user) {
 			return new Promise((resolve) =>
@@ -88,7 +88,7 @@ const getUserWithEmailOrId = async (contextObject: {
 	}
 };
 
-const createStudent = async (contextObject: {
+const createConsumer = async (contextObject: {
 	email: string;
 	userFullName: string;
 	appType: string;
@@ -102,13 +102,13 @@ const createStudent = async (contextObject: {
 
 	const emailFinal = emailValidation.data.payload as string;
 
-	if (appType !== 'zing_student') {
+	if (appType !== 'zing_consumer') {
 		return new Promise((resolve) =>
 			resolve(
 				responseHandler({
 					uniqueCodeData: uniqueCodes.appTypeNotValid,
 					data: { type: 'error', payload: null },
-					functionName: 'createStudent',
+					functionName: 'createConsumer',
 				})
 			)
 		);
@@ -120,7 +120,7 @@ const createStudent = async (contextObject: {
 				responseHandler({
 					uniqueCodeData: uniqueCodes.userFullNameRequired,
 					data: { type: 'error', payload: null },
-					functionName: 'createStudent',
+					functionName: 'createConsumer',
 				})
 			)
 		);
@@ -142,20 +142,20 @@ const createStudent = async (contextObject: {
 	const campusId = _id;
 
 	try {
-		const newStudent: IUserModel = await User.create({
+		const newConsumer: IUserModel = await User.create({
 			userEmail: emailFinal,
 			userFullName: userFullNameClean,
-			userRole: 'student',
+			userRole: 'consumer',
 			campusId,
 		});
 
-		if (!newStudent) {
+		if (!newConsumer) {
 			return new Promise((resolve) =>
 				resolve(
 					responseHandler({
 						uniqueCodeData: uniqueCodes.userNotCreated,
 						data: { type: 'error', payload: null },
-						functionName: 'createStudent',
+						functionName: 'createConsumer',
 					})
 				)
 			);
@@ -165,8 +165,8 @@ const createStudent = async (contextObject: {
 			resolve(
 				responseHandler({
 					uniqueCodeData: uniqueCodes.userCreated,
-					data: { type: 'success', payload: newStudent },
-					functionName: 'createStudent',
+					data: { type: 'success', payload: newConsumer },
+					functionName: 'createConsumer',
 				})
 			)
 		);
@@ -176,7 +176,7 @@ const createStudent = async (contextObject: {
 				responseHandler({
 					uniqueCodeData: uniqueCodes.internalServerError,
 					data: { type: 'error', payload: null },
-					functionName: 'createStudent',
+					functionName: 'createConsumer',
 				})
 			)
 		);
@@ -190,7 +190,7 @@ const userAuth = async (contextObject: {
 }): Promise<IResponseMessage> => {
 	const { appType, email, userFullName } = contextObject;
 
-	const userWithEmail = await getUserWithEmailOrId({
+	const userWithEmail: IResponseMessage = await getUserWithEmailOrId({
 		email,
 		userId: null,
 		appType,
@@ -209,25 +209,25 @@ const userAuth = async (contextObject: {
 				);
 			}
 
-			const newStudent: IResponseMessage = await createStudent({
+			const newConsumer: IResponseMessage = await createConsumer({
 				email,
 				userFullName,
 				appType,
 			});
 
-			const studentObj = newStudent.data.payload as IUserModel;
+			const consumerObj = newConsumer.data.payload as IUserModel;
 
 			const signJwtResponse: string = signJwt({
-				email: studentObj.userEmail as string,
-				_id: studentObj._id as string,
+				email: consumerObj.userEmail,
+				_id: consumerObj._id,
 			});
 
-			newStudent.data.payload = {
-				user: newStudent.data.payload,
+			newConsumer.data.payload = {
+				user: newConsumer.data.payload,
 				token: signJwtResponse,
 			};
 
-			return newStudent;
+			return newConsumer;
 		}
 		return userWithEmail;
 	}
@@ -235,8 +235,8 @@ const userAuth = async (contextObject: {
 	const userObj = userWithEmail.data.payload as IUserModel;
 
 	const signJwtResponse: string = signJwt({
-		email: userObj.userEmail as string,
-		_id: userObj._id as string,
+		email: userObj.userEmail,
+		_id: userObj._id,
 	});
 
 	userWithEmail.data.payload = {
@@ -253,13 +253,13 @@ const getLoggedInUser = async (contextObject: {
 }): Promise<IResponseMessage> => {
 	const { appType, loggedInUser } = contextObject;
 
-	const appValidation = appTypeValidator(appType);
+	const appValidation: IResponseMessage = appTypeValidator(appType);
 	if (appValidation.data.type === 'error') {
 		return new Promise((resolve) => resolve(appValidation));
 	}
 
 	const userRole =
-		loggedInUser.userRole === 'student' ? 'zing_student' : 'zing_owner';
+		loggedInUser.userRole === 'consumer' ? 'zing_consumer' : 'zing_owner';
 
 	if (userRole !== appType) {
 		return new Promise((resolve) =>
@@ -284,4 +284,4 @@ const getLoggedInUser = async (contextObject: {
 	);
 };
 
-export { userAuth, getUserWithEmailOrId, createStudent, getLoggedInUser };
+export { userAuth, getUserWithEmailOrId, createConsumer, getLoggedInUser };

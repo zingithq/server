@@ -14,7 +14,7 @@ const appTypeValidator = (appType: string): IResponseMessage => {
 	let appTypeClean = appType.trim();
 	appTypeClean = appTypeClean.toLowerCase();
 
-	if (appTypeClean !== 'zing_owner' && appTypeClean !== 'zing_student') {
+	if (appTypeClean !== 'zing_owner' && appTypeClean !== 'zing_consumer') {
 		return responseHandler({
 			uniqueCodeData: uniqueCodes.appTypeNotValid,
 			data: { type: 'error', payload: null },

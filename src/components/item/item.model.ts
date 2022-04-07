@@ -18,6 +18,11 @@ const ItemSchema: Schema = new Schema(
 			required: true,
 			default: true,
 		},
+		campusId: {
+			type: Schema.Types.ObjectId,
+			ref: 'Campus',
+			required: true,
+		},
 		outletId: {
 			type: Schema.Types.ObjectId,
 			ref: 'Outlet',
@@ -27,15 +32,26 @@ const ItemSchema: Schema = new Schema(
 			type: Number,
 			required: true,
 		},
+		isFav: {
+			type: Boolean,
+			required: true,
+			default: false,
+		},
 		itemImageSmall: {
 			type: String,
-			required: true,
+			required() {
+				return this.isFav === true;
+			},
 			trim: true,
+			default: null,
 		},
 		itemImageLarge: {
 			type: String,
-			required: true,
+			required() {
+				return this.isFav === true;
+			},
 			trim: true,
+			default: null,
 		},
 		itemCategory: {
 			type: String,

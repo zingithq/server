@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
-import envConfig from '../config/config';
 import uniqueCodes from '../constants/uniqueCodes';
+import envConfig from '../config/config';
 import decryptText from '../helpers/decryptText';
 import IUniqueCode from '../types/IUniqueCode';
 import responseHandler from '../utils/responseHandler';
@@ -55,10 +55,19 @@ const checkRequestOrigin = (
 	const decryptedOrigin = decryptText(reqOriginClean);
 
 	const originParts = decryptedOrigin.split('/');
+
 	const originTime = Number(originParts[0]);
 	const originApp = originParts[1];
 
-	if (!originTime || !originApp) {
+	if (!originApp) {
+		return res
+			.status(errorHandler(uniqueCodes.reqOriginInvalid).statusCode)
+			.json({
+				response: errorHandler(uniqueCodes.reqOriginInvalid),
+			});
+	}
+
+	if (!originTime) {
 		return res
 			.status(errorHandler(uniqueCodes.reqOriginInvalid).statusCode)
 			.json({
@@ -79,7 +88,7 @@ const checkRequestOrigin = (
 			});
 	}
 
-	if (originApp !== 'zing_student' && originApp !== 'zing_owner') {
+	if (originApp !== 'zing_consumer' && originApp !== 'zing_owner') {
 		return res
 			.status(errorHandler(uniqueCodes.reqOriginInvalid).statusCode)
 			.json({

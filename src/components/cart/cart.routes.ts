@@ -6,20 +6,23 @@ import { addItem, clearCart, getCart, removeItem } from './cart.controllers';
 
 const router = Router();
 
-router.get('/', [verifyApplicationType('zing_student'), verifyToken], getCart);
-router.put(
+router.get('/', [verifyApplicationType('zing_consumer'), verifyToken], getCart);
+
+router.patch(
 	'/add',
-	[verifyApplicationType('zing_student'), verifyToken],
+	[verifyApplicationType('zing_consumer'), verifyToken],
 	addItem
 );
-router.put(
+
+router.patch(
 	'/remove',
-	[verifyApplicationType('zing_student'), verifyToken],
+	[verifyApplicationType('zing_consumer'), verifyToken],
 	removeItem
 );
-router.put(
+
+router.patch(
 	'/clear',
-	[verifyApplicationType('zing_student'), verifyToken],
+	[verifyApplicationType('zing_consumer'), verifyToken],
 	clearCart
 );
 

@@ -12,7 +12,7 @@ import responseHandler from '../utils/responseHandler';
 
 const verifyApplicationType =
 	(requiredAppType: string) =>
-	async (req: Request, res: Response, next: NextFunction) => {
+	async (_: Request, res: Response, next: NextFunction) => {
 		const { appType } = res.locals;
 
 		const appValidation: IResponseMessage = appTypeValidator(appType);
@@ -22,7 +22,7 @@ const verifyApplicationType =
 				.json({ response: appValidation });
 		}
 
-		const cleanAppType = appValidation.data.payload;
+		const cleanAppType = appValidation.data.payload as string;
 
 		if (cleanAppType !== requiredAppType) {
 			const errorMessage: IResponseMessage = responseHandler({

@@ -14,11 +14,8 @@
 	"plugins": ["@typescript-eslint", "prettier"],
 	"rules": {
 		"prettier/prettier": "error",
-		"no-unused-vars": "warn",
 		"no-console": "off",
-		"func-names": "off",
-		"prefer-rest-params": "off",
-		"radix": "off",
+
 		"node/no-unsupported-features/es-syntax": [
 			"error",
 			{

@@ -20,7 +20,7 @@ const UserSchema: Schema = new Schema(
 		userProfileImage: {
 			// TODO: Add profile Image link for default
 			type: String,
-			required: true,
+			required: false,
 			trim: true,
 			default: 'https://google.com/imgae',
 		},
@@ -32,7 +32,7 @@ const UserSchema: Schema = new Schema(
 		userRole: {
 			type: String,
 			required: true,
-			enum: ['owner', 'student'],
+			enum: ['owner', 'consumer'],
 			lowercase: true,
 		},
 		userPhone: {
@@ -40,9 +40,9 @@ const UserSchema: Schema = new Schema(
 			required() {
 				return this.role === 'owner';
 			},
+			default: '9999999999',
 			trim: true,
 			lowercase: true,
-			unique: true,
 			length: 10,
 		},
 		userCart: [

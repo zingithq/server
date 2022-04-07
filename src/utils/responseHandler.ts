@@ -5,7 +5,7 @@ import IResponseParams from '../types/IResponseParams';
 const responseHandler = (responseObject: IResponseParams) => {
 	const { uniqueCodeData, data, functionName } = responseObject;
 
-	const { message, status, code } = uniqueCodeData;
+	const { message, status, code, responseCode } = uniqueCodeData;
 
 	const response: IResponseMessage = {
 		message,
@@ -13,6 +13,7 @@ const responseHandler = (responseObject: IResponseParams) => {
 		uniqueCode: code,
 		data,
 		functionName,
+		responseCode,
 	};
 
 	if (envConfig.ENVIRONMENT === 'production') {

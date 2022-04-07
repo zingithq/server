@@ -43,6 +43,11 @@ function decrypt(text) {
 }
 
 // Displays output
-var output = encrypt(new Date().getTime().toString() + '/zing_student');
+var output = encrypt(new Date().getTime().toString() + '/zing_consumer');
 var decrypted = decrypt(output);
 console.log(output, decrypted, key);
+
+// item image: only favs have image
+// Rating system: Ask for additional
+// Order Decline: Ask for reason
+// Make database

@@ -1,5 +1,7 @@
 import mongoose, { Schema } from 'mongoose';
 
+import IOutletModel from '../../types/IOutletModel';
+
 const OutletSchema: Schema = new Schema(
 	{
 		campusId: {
@@ -48,5 +50,4 @@ const OutletSchema: Schema = new Schema(
 		timestamps: true,
 	}
 );
-
-module.exports = mongoose.model('Outlet', OutletSchema);
+export default mongoose.model<IOutletModel>('Outlet', OutletSchema);

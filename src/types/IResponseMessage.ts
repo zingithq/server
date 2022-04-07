@@ -4,6 +4,7 @@ interface IResponseMessage {
 	uniqueCode: string;
 	data: { type: string; payload: unknown };
 	functionName: string | null;
+	responseCode: number;
 }
 
 export default IResponseMessage;
