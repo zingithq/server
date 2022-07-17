@@ -56,7 +56,7 @@ You must have **_NodeJs_, _npm_, _mongodb_** installed in your system in order t
 Any kind of contributions are welcome to this project. Go through the below mentioned steps to contribute.
 - Proceed by installing the project in your system. You can go through [Installation](https://github.com/zingithq/server#installation) for that.
 - Create an issue for the feature/fix you are planning on implementing.
-- To push the changes, create a new branch with the following scheme: YOUR NAME / Feature Summary
+- To push the changes, create a new branch with the following scheme: GH Name/Feature Summary
 - Create a pull request with a proper commit heading and message. Add _AdityaKG-169_ as the reviewer.
 
 ### Got any questions?
